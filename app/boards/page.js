@@ -19,7 +19,7 @@ export default async function Board() {
 }
 
 async function getBoards() {
-    const res = await fetch('http://localhost:3000/api/boards');
+    const res = await fetch(`${process.env.SERVER}/api/boards`);
     const boards = await res.json();
 
     return boards;
