@@ -1,7 +1,11 @@
 import clientPromise from "./mongodb-client";
 
+let client;
+
 export async function connectDb() {
-    const client = await clientPromise;
+    if (!client) {
+        client = await clientPromise;
+    }
 
     return client.db('calcshare');
 }

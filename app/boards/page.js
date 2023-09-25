@@ -1,3 +1,4 @@
+import { connectDb } from '@/db/calcshare-db';
 import Link from "next/link";
 
 export default async function Board() {
@@ -6,7 +7,7 @@ export default async function Board() {
     const boardItems = boards.map((board) =>
         <p key={board._id}>
             <Link href={'/boards/' + board._id}>
-                {board.currentVersion?.name ?? board.draft.name}
+                {board?.currentVersion?.name ?? board?.draft?.name}
             </Link>
         </p>
     )
@@ -19,8 +20,8 @@ export default async function Board() {
 }
 
 async function getBoards() {
-    const res = await fetch(`${process.env.SERVER}/api/boards`);
-    const boards = await res.json();
+    const db = await connectDb();
+    const boards = await db.collection('boards').find({}).limit(100).toArray();
 
     return boards;
 }
