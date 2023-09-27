@@ -1,27 +1,17 @@
-import { connectDb } from '@/db/calcshare-db';
-import Link from "next/link";
+import BoardList from "@/components/board-list";
+import { getBoards } from "@/db/repositories/board";
+
+export const metadata = {
+    title: 'CalcShare / Boards'
+}
 
 export default async function Board() {
     const boards = await getBoards();
-
-    const boardItems = boards.map((board) =>
-        <p key={board._id}>
-            <Link href={'/boards/' + board._id}>
-                {board?.currentVersion?.name ?? board?.draft?.name}
-            </Link>
-        </p>
-    )
+    const publishedBoards = boards
+        .filter(board => !!board.currentVersion)
+        .map(board => ({ ...board.currentVersion, _id: board._id }));
 
     return (
-        <main>
-            {boardItems}
-        </main>
+        <BoardList boards={publishedBoards} />
     )
-}
-
-async function getBoards() {
-    const db = await connectDb();
-    const boards = await db.collection('boards').find({}).limit(100).toArray();
-
-    return boards;
 }
