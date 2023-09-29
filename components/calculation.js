@@ -1,9 +1,8 @@
 
-export default async function Calculation({ calculation }) {
+export default function Calculation({ equation, onChange }) {
     return (
-        <div className="group border-solid border-2 border rounded-lg p-4">
-            <span>{calculation.equation.raw}</span>
-            <pre className="hidden group-hover:block">{JSON.stringify(calculation, null, 2)}</pre>
+        <div className="group border-solid border-2 border rounded-lg">
+            <input autoFocus className="w-full p-4 rounded-lg" value={equation} onChange={(event) => onChange(event.target.value)} />
         </div>
     )
 }

@@ -1,19 +1,26 @@
 
 'use client'
 
-export default async function Variable({ variable }) {
+import { useMemo } from "react"
+import VariableDisplay from "./variable-display"
+import VariableInput from "./variable-input"
+
+export default function Variable({ name, input, value, isDeterminate, onChange }) {
+    const variableElement = useMemo(() => {
+        if (isDeterminate && !input) {
+            return <VariableDisplay name={name} value={value} />
+        }
+
+        return <VariableInput
+            name={name}
+            input={input}
+            value={value}
+            onChange={onChange} />
+    }, [input, value, name, isDeterminate])
+
     return (
-        <div className="group border-solid border-2 rounded-lg p-4">
-            <span>{variable.displayName ?? variable.name} = {getVariableElement(variable)}</span>
-            <pre className="hidden group-hover:block">{JSON.stringify(variable, null, 2)}</pre>
+        <div className="group border-solid border-2 rounded-lg">
+            {variableElement}
         </div>
     )
-}
-
-function getVariableElement(variable) {
-    if (variable.isDeterminate && !variable.input) {
-        return <span>{variable.value}</span>
-    }
-
-    return <input value={variable.input} placeholder={variable.value} />
 }
