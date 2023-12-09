@@ -1,4 +1,4 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
-
-module.exports = nextConfig;
+module.exports = {
+    reactStrictMode: true, // This should be on, but causes effects to be run twice
+};

@@ -1,13 +1,15 @@
 'use client'
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Calculation from "./calculation";
 import Variable from "./variable";
 
 export default function Board({ id, board }) {
     const [variables, setVariables] = useState(board.variables)
     const [calculations, setCalculations] = useState(board.calculations)
+    const iframeRef = useRef(null)
+    const [isLoading, setIsLoading] = useState(false)
 
     function updateVariableInput(variableId, input) {
         const updatedVariables = variables.map((variable) => {
@@ -46,6 +48,28 @@ export default function Board({ id, board }) {
         setCalculations(updatedCalculations)
     }
 
+    async function sendMessage() {
+        setIsLoading(true)
+        iframeRef.current.contentWindow.postMessage(JSON.stringify({
+            type: 'success',
+            message: "Hello iframe, this is your parent speaking, let me know when you're done thinking ok?"
+        }))
+    }
+
+    useEffect(() => {
+        const handler = async event => {
+            if (typeof event.data === 'object') return
+
+            const data = JSON.parse(event.data)
+            console.log("xxx - Parent window just got a message:", data.message)
+            setIsLoading(false)
+        }
+
+        window.addEventListener("message", handler)
+
+        return () => window.removeEventListener("message", handler)
+    }, [])
+
     return (
         <div>
             <h1>
@@ -78,7 +102,9 @@ export default function Board({ id, board }) {
                 />))}
                 <div><button onClick={addCalculation}>Add Calculation</button></div>
             </div>
-
+            <iframe src={'/boards/' + id + '/core'} ref={iframeRef}></iframe>
+            <button onClick={sendMessage}>Send message to iframe</button>
+            {isLoading > 0 && <div class="lds-ring"><div></div><div></div><div></div><div></div></div>}
         </div>
     )
 }
