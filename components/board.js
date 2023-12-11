@@ -8,7 +8,7 @@ import Variable from "./variable";
 export default function Board({ id, board }) {
     const [variables, setVariables] = useState(board.variables)
     const [calculations, setCalculations] = useState(board.calculations)
-    const iframeRef = useRef(null)
+    const workerRef = useRef(null)
     const [isLoading, setIsLoading] = useState(false)
 
     function updateVariableInput(variableId, input) {
@@ -27,6 +27,13 @@ export default function Board({ id, board }) {
         const updatedCalculations = calculations.map((calculation) => {
             if (calculation._id === calculationId) {
                 calculation.equation.raw = equationInput
+
+                workerRef.current.postMessage(JSON.stringify({
+                    action: 'update-calculation',
+                    payload: {
+                        calculationId, calculation: equationInput
+                    }
+                }))
             }
 
             return calculation
@@ -44,30 +51,38 @@ export default function Board({ id, board }) {
             }
         }
 
+        workerRef.current.postMessage(JSON.stringify({
+            action: 'add-calculation',
+            payload: JSON.stringify(calculation)
+        }))
+
+        workerRef.current.postMessage(JSON.stringify({
+            action: 'calculate-variables',
+            payload: variables
+        }))
+
         const updatedCalculations = [...calculations, calculation]
         setCalculations(updatedCalculations)
     }
 
     async function sendMessage() {
         setIsLoading(true)
-        iframeRef.current.contentWindow.postMessage(JSON.stringify({
+        workerRef.current.postMessage(JSON.stringify({
             type: 'success',
             message: "Hello iframe, this is your parent speaking, let me know when you're done thinking ok?"
         }))
     }
 
     useEffect(() => {
-        const handler = async event => {
-            if (typeof event.data === 'object') return
+        workerRef.current = new Worker(new URL('../workers/calcworker.js', import.meta.url))
 
-            const data = JSON.parse(event.data)
-            console.log("xxx - Parent window just got a message:", data.message)
+        workerRef.current.onmessage = event => {
             setIsLoading(false)
+            if (typeof event.data === 'object') return
+            console.log('received message from worker', event.data)
         }
 
-        window.addEventListener("message", handler)
-
-        return () => window.removeEventListener("message", handler)
+        return () => workerRef.current.terminate()
     }, [])
 
     return (
@@ -102,8 +117,7 @@ export default function Board({ id, board }) {
                 />))}
                 <div><button onClick={addCalculation}>Add Calculation</button></div>
             </div>
-            <iframe src={'/boards/' + id + '/core'} ref={iframeRef}></iframe>
-            <button onClick={sendMessage}>Send message to iframe</button>
+            <button disabled={isLoading} onClick={sendMessage}>Send message to iframe</button>
             {isLoading > 0 && <div class="lds-ring"><div></div><div></div><div></div><div></div></div>}
         </div>
     )
