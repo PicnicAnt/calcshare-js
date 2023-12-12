@@ -1,9 +1,7 @@
-
-'use client'
-
 import { useEffect, useRef } from "react";
 
 // This page is used for iframe integrations, passing messages to the calcworker
+// TODO: generateStatic
 export default function BoardPage({ params }) {
     const workerRef = useRef(null)
     // This will be posted twice in dev mode, since React.StrictMode is on (see next.config.js)

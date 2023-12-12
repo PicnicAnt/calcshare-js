@@ -5,7 +5,13 @@ export default async function DraftPage({ params }) {
     const board = await getBoard(params.id);
 
     return (
-        <Board id={board._id} board={board.draft} />
+        <div>
+            <h1>
+                {board.name}
+            </h1>
+            <hr />
+            <Board id={board._id.toString()} boardJSON={JSON.stringify(board.currentVersion)} />
+        </div>
     )
 }
 

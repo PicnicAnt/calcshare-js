@@ -1,11 +1,21 @@
 import Board from '@/components/board';
 import { getBoard, getBoards } from '@/db/repositories/board';
+import Link from 'next/link';
 
 export default async function BoardPage({ params }) {
     const board = await getBoard(params.id);
 
     return (
-        <Board id={board._id} board={board.currentVersion} />
+        <div>
+            <h1>
+                {board.name} -
+                <Link href={`/boards/${params.id}/draft`}>
+                    <button>Open draft</button>
+                </Link>
+            </h1>
+            <hr />
+            <Board id={board._id.toString()} boardJSON={JSON.stringify(board.currentVersion)} />
+        </div>
     )
 }
 

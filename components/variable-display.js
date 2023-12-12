@@ -1,3 +1,5 @@
+'use client'
+
 export default function VariableDisplay({ name, value }) {
     return (
         <div className="p-4">

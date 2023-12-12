@@ -1,26 +1,30 @@
-console.log('created worker')
-
 addEventListener('message', (event) => {
     const { action, payload } = JSON.parse(event.data)
 
     switch (action) {
+        case 'init':
+            init(payload)
+            break
         case 'add-calculation':
-            addCalculation(payload);
-            break;
+            addCalculation(payload)
+            break
         case 'update-calculation':
             updateCalculation(payload.calculationId, payload.calculation)
-            break;
+            break
         case 'remove-calculation':
             removeCalculation(payload.calculationId)
-            break;
+            break
         case 'calculate-variables':
             calculateVariables(payload)
-            break;
+            break
         default:
-            console.log('unknown action', action)
             postMessage('unknown action')
     }
 })
+
+function init() {
+    postMessage(`ready`)
+}
 
 function addCalculation(calculation) {
     postMessage(`added calculation with value ${calculation}`)
@@ -36,8 +40,9 @@ function removeCalculation(calculationId) {
 
 function calculateVariables(variables) {
     for (let variable of variables) {
+        postMessage(`calculating variable ${variable.name}...`)
         delay(1000)
-        postMessage(`calculated variable ${JSON.stringify(variable)}`)
+        postMessage(`calculated variable ${variable.name}`)
     }
 }
 
