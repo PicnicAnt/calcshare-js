@@ -1,5 +1,6 @@
 'use client'
 
+import { WorkerWrapper } from "@/workers/worker-wrapper";
 import { useEffect, useRef, useState } from "react";
 import Calculation from "./calculation";
 import Variable from "./variable";
@@ -8,8 +9,9 @@ export default function Board({ id, boardJSON }) {
     const [board, setBoard] = useState(JSON.parse(boardJSON))
     const [variables, setVariables] = useState(board.variables)
     const [calculations, setCalculations] = useState(board.calculations)
-    const workerRef = useRef(null)
     const [isLoading, setIsLoading] = useState(false)
+
+    const workerRef = useRef(null)
 
     function updateVariableInput(variableId, input) {
         const updatedVariables = variables.map((variable) => {
@@ -28,12 +30,10 @@ export default function Board({ id, boardJSON }) {
             if (calculation._id === calculationId) {
                 calculation.equation.raw = equationInput
 
-                workerRef.current.postMessage(JSON.stringify({
-                    action: 'update-calculation',
-                    payload: {
-                        calculationId, calculation: equationInput
-                    }
-                }))
+                workerRef.current.postMessage('update-calculation', {
+                    calculationId,
+                    calculation: equationInput
+                })
             }
 
             return calculation
@@ -51,15 +51,8 @@ export default function Board({ id, boardJSON }) {
             }
         }
 
-        workerRef.current.postMessage(JSON.stringify({
-            action: 'add-calculation',
-            payload: JSON.stringify(calculation)
-        }))
-
-        workerRef.current.postMessage(JSON.stringify({
-            action: 'calculate-variables',
-            payload: variables
-        }))
+        workerRef.current.postMessage('add-calculation', calculation)
+        workerRef.current.postMessage('calculate-variables', variables)
 
         const updatedCalculations = [...calculations, calculation]
         setCalculations(updatedCalculations)
@@ -67,20 +60,19 @@ export default function Board({ id, boardJSON }) {
 
     async function sendMessage() {
         setIsLoading(true)
-        workerRef.current.postMessage(JSON.stringify({
-            type: 'success',
-            message: "Hello iframe, this is your parent speaking, let me know when you're done thinking ok?"
-        }))
+        workerRef.current.postMessage('init', board)
     }
 
     useEffect(() => {
-        workerRef.current = new Worker(new URL('../workers/calcworker.js', import.meta.url))
+        const worker = new Worker(new URL('../workers/calcworker.js', import.meta.url))
 
-        workerRef.current.onmessage = event => {
+        worker.onmessage = event => {
             setIsLoading(false)
-            if (typeof event.data === 'object') return
             console.log('received message from worker', event.data)
         }
+
+        workerRef.current = new WorkerWrapper(worker)
+        workerRef.current.postMessage('init', board)
 
         return () => workerRef.current.terminate()
     }, [])

@@ -27,11 +27,11 @@ function init() {
 }
 
 function addCalculation(calculation) {
-    postMessage(`added calculation with value ${calculation}`)
+    postMessage(`added calculation with value ${JSON.stringify(calculation)}`)
 }
 
 function updateCalculation(calculationId, calculation) {
-    postMessage(`updated calculation ${calculationId} with value ${calculation}`)
+    postMessage(`updated calculation ${calculationId} with value ${JSON.stringify(calculation)}`)
 }
 
 function removeCalculation(calculationId) {
