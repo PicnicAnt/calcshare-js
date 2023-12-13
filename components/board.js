@@ -88,7 +88,7 @@ export default function Board({ id, boardJSON }) {
         workerRef.current.postMessage('init', board)
 
         return () => workerRef.current.terminate()
-    }, [])
+    }, [board])
 
     return (
         <div>
@@ -118,7 +118,6 @@ export default function Board({ id, boardJSON }) {
             {logMessages.length > 0 && <ol>
                 {logMessages.map(message => <li key={message}>{message}</li>)}
             </ol>}
-
         </div>
     )
 }

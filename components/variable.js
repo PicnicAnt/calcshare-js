@@ -16,7 +16,7 @@ export default function Variable({ name, input, value, isDeterminate, onChange }
             input={input}
             value={value}
             onChange={onChange} />
-    }, [input, value, name, isDeterminate])
+    }, [input, value, name, isDeterminate, onChange])
 
     return (
         <div className="group border-solid border-2 rounded-lg">
