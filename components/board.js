@@ -9,7 +9,7 @@ export default function Board({ id, boardJSON }) {
     const [board, setBoard] = useState(JSON.parse(boardJSON))
     const [variables, setVariables] = useState(board.variables)
     const [calculations, setCalculations] = useState(board.calculations)
-    const [isLoading, setIsLoading] = useState(false)
+    const [isLoading, setIsLoading] = useState(true)
 
     const workerRef = useRef(null)
 
@@ -66,12 +66,24 @@ export default function Board({ id, boardJSON }) {
     useEffect(() => {
         const worker = new Worker(new URL('../workers/calcworker.js', import.meta.url))
 
-        worker.onmessage = event => {
-            setIsLoading(false)
-            console.log('received message from worker', event.data)
-        }
-
         workerRef.current = new WorkerWrapper(worker)
+        workerRef.current.on('ready', payload => {
+            setIsLoading(false)
+            console.log('worker is now ready')
+        })
+
+        workerRef.current.on('added-calculation', payload => {
+            console.log('added calculation', payload)
+        })
+
+        workerRef.current.on('calculating-variable', payload => {
+            console.log('calculating variable', payload, '...')
+        })
+
+        workerRef.current.on('calculated-variable', payload => {
+            console.log('calculated variable', payload)
+        })
+
         workerRef.current.postMessage('init', board)
 
         return () => workerRef.current.terminate()

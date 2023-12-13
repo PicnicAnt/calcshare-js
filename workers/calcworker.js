@@ -23,26 +23,26 @@ addEventListener('message', (event) => {
 })
 
 function init() {
-    postMessage(`ready`)
+    postMessage({ messageType: 'ready' })
 }
 
 function addCalculation(calculation) {
-    postMessage(`added calculation with value ${JSON.stringify(calculation)}`)
+    postMessage({ messageType: 'added-calculation', payload: JSON.stringify(calculation) })
 }
 
 function updateCalculation(calculationId, calculation) {
-    postMessage(`updated calculation ${calculationId} with value ${JSON.stringify(calculation)}`)
+    postMessage({ messageType: 'updated-calculation', payload: JSON.stringify(calculation) })
 }
 
 function removeCalculation(calculationId) {
-    postMessage(`removed calculation ${calculationId}`)
+    postMessage({ messageType: 'removed-calculation', payload: calculationId })
 }
 
 function calculateVariables(variables) {
     for (let variable of variables) {
-        postMessage(`calculating variable ${variable.name}...`)
+        postMessage({ messageType: 'calculating-variable', payload: variable.name })
         delay(1000)
-        postMessage(`calculated variable ${variable.name}`)
+        postMessage({ messageType: 'calculated-variable', payload: variable.name })
     }
 }
 
