@@ -23,26 +23,26 @@ addEventListener('message', (event) => {
 })
 
 function init() {
-    postMessage({ messageType: 'ready' })
+    message('ready')
 }
 
 function addCalculation(calculation) {
-    postMessage({ messageType: 'added-calculation', payload: JSON.stringify(calculation) })
+    message('added-calculation', JSON.stringify(calculation))
 }
 
 function updateCalculation(calculationId, calculation) {
-    postMessage({ messageType: 'updated-calculation', payload: JSON.stringify(calculation) })
+    message('updated-calculation', JSON.stringify(calculation))
 }
 
 function removeCalculation(calculationId) {
-    postMessage({ messageType: 'removed-calculation', payload: calculationId })
+    message('removed-calculation', calculationId)
 }
 
 function calculateVariables(variables) {
     for (let variable of variables) {
-        postMessage({ messageType: 'calculating-variable', payload: variable.name })
+        message('calculating-variable', variable.name)
         delay(1000)
-        postMessage({ messageType: 'calculated-variable', payload: variable.name })
+        message('calculated-variable', variable.name)
     }
 }
 
@@ -52,4 +52,8 @@ function delay(ms) {
     while (Date.now() - start < ms) {
         // Busy-waiting to consume CPU time
     }
+}
+
+function message(messageType, payload) {
+    postMessage({ messageType, payload })
 }
