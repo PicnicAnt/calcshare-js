@@ -1,6 +1,7 @@
 export class WorkerWrapper {
     worker
     callbacks
+    log
 
     constructor(worker) {
         this.worker = worker
@@ -13,6 +14,7 @@ export class WorkerWrapper {
 
             for (let callback of callbacks) {
                 callback(payload)
+                this.log && this.log(`${messageType}${payload ? ': ' + JSON.stringify(payload) : ''}`)
             }
         }
     }

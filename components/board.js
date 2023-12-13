@@ -10,6 +10,7 @@ export default function Board({ id, boardJSON }) {
     const [variables, setVariables] = useState(board.variables)
     const [calculations, setCalculations] = useState(board.calculations)
     const [isLoading, setIsLoading] = useState(true)
+    const [logMessages, setLogMessages] = useState([])
 
     const workerRef = useRef(null)
 
@@ -44,6 +45,7 @@ export default function Board({ id, boardJSON }) {
 
     function addCalculation() {
         /* TODO: create a proper ID */
+        setIsLoading(true)
         const calculation = {
             _id: '12352343',
             equation: {
@@ -58,15 +60,13 @@ export default function Board({ id, boardJSON }) {
         setCalculations(updatedCalculations)
     }
 
-    async function sendMessage() {
-        setIsLoading(true)
-        workerRef.current.postMessage('init', board)
-    }
-
     useEffect(() => {
         const worker = new Worker(new URL('../workers/calcworker.js', import.meta.url))
 
         workerRef.current = new WorkerWrapper(worker)
+        workerRef.current.log = (message) => {
+            setLogMessages(messages => [...messages, message])
+        }
         workerRef.current.on('ready', payload => {
             setIsLoading(false)
             console.log('worker is now ready')
@@ -74,6 +74,7 @@ export default function Board({ id, boardJSON }) {
 
         workerRef.current.on('added-calculation', payload => {
             console.log('added calculation', payload)
+            setIsLoading(false)
         })
 
         workerRef.current.on('calculating-variable', payload => {
@@ -113,8 +114,11 @@ export default function Board({ id, boardJSON }) {
                 />))}
                 <div><button onClick={addCalculation}>Add Calculation</button></div>
             </div>
-            <button disabled={isLoading} onClick={sendMessage}>Send message to iframe</button>
-            {isLoading > 0 && <div class="lds-ring"><div></div><div></div><div></div><div></div></div>}
+            {isLoading > 0 && <div className="lds-ring"><div></div><div></div><div></div><div></div></div>}
+            {logMessages.length > 0 && <ol>
+                {logMessages.map(message => <li>{message}</li>)}
+            </ol>}
+
         </div>
     )
 }
