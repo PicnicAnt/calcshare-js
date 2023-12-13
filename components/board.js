@@ -64,7 +64,9 @@ export default function Board({ id, boardJSON }) {
         const worker = new Worker(new URL('../workers/calcworker.js', import.meta.url))
 
         workerRef.current = new WorkerWrapper(worker)
-        workerRef.current.log = (message) => {
+        workerRef.current.log = (timestamp, messageType, payload) => {
+            const message = `${timestamp} - ${messageType}${payload ? ': ' + payload : ''}`
+
             setLogMessages(messages => [...messages, message])
         }
         workerRef.current.on('ready', payload => {

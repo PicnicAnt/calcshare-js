@@ -14,7 +14,11 @@ export class WorkerWrapper {
 
             for (let callback of callbacks) {
                 callback(payload)
-                this.log && this.log(`${messageType}${payload ? ': ' + JSON.stringify(payload) : ''}`)
+                if (this.log) {
+                    const now = new Date()
+                    const timestamp = `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}.${now.getMilliseconds()}`
+                    this.log(timestamp, messageType, payload)
+                }
             }
         }
     }
