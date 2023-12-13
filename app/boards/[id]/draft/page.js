@@ -10,7 +10,7 @@ export default async function DraftPage({ params }) {
                 {board.name}
             </h1>
             <hr />
-            <Board id={board._id.toString()} boardJSON={JSON.stringify(board.currentVersion)} />
+            <Board id={board._id.toString()} boardJSON={JSON.stringify(board.draft)} />
         </div>
     )
 }

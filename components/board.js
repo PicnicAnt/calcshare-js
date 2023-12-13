@@ -116,7 +116,7 @@ export default function Board({ id, boardJSON }) {
             </div>
             {isLoading > 0 && <div className="lds-ring"><div></div><div></div><div></div><div></div></div>}
             {logMessages.length > 0 && <ol>
-                {logMessages.map(message => <li>{message}</li>)}
+                {logMessages.map(message => <li key={message}>{message}</li>)}
             </ol>}
 
         </div>
