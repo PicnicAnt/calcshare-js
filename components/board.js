@@ -60,6 +60,30 @@ export default function Board({ id, boardJSON }) {
         setCalculations(updatedCalculations)
     }
 
+    function onCalculatingVariable(variableName) {
+        console.log('calculating variable', variableName)
+        const updatedVariables = variables.map((variable) => {
+            if (variable.name === variableName) {
+                variable.isLoading = true
+            }
+
+            return variable
+        })
+        setVariables(updatedVariables)
+    }
+
+    function onCalculatedVariable(variableName) {
+        console.log('calculated variable', variableName)
+        const updatedVariables = variables.map((variable) => {
+            if (variable.name === variableName) {
+                variable.isLoading = false
+            }
+
+            return variable
+        })
+        setVariables(updatedVariables)
+    }
+
     useEffect(() => {
         const worker = new Worker(new URL('../workers/calcworker.js', import.meta.url))
 
@@ -79,13 +103,9 @@ export default function Board({ id, boardJSON }) {
             setIsLoading(false)
         })
 
-        workerRef.current.on('calculating-variable', payload => {
-            console.log('calculating variable', payload, '...')
-        })
+        workerRef.current.on('calculating-variable', onCalculatingVariable)
 
-        workerRef.current.on('calculated-variable', payload => {
-            console.log('calculated variable', payload)
-        })
+        workerRef.current.on('calculated-variable', onCalculatedVariable)
 
         workerRef.current.postMessage('init', board)
 
@@ -103,6 +123,7 @@ export default function Board({ id, boardJSON }) {
                     input={variable.input}
                     value={variable.value}
                     isDeterminate={variable.isDeterminate}
+                    isLoading={variable.isLoading}
                     onChange={(input) => updateVariableInput(variable._id, input)}
                 />))}
             </div>
