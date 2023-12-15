@@ -7,6 +7,10 @@ import VariableInput from "./variable-input"
 
 export default function Variable({ name, input, value, isDeterminate, onChange, isLoading }) {
     const variableElement = useMemo(() => {
+        if (isLoading) {
+            return <span>Calculating...</span>
+        }
+
         if (isDeterminate && !input) {
             return <VariableDisplay name={name} value={value} />
         }
@@ -21,7 +25,6 @@ export default function Variable({ name, input, value, isDeterminate, onChange, 
     return (
         <div className="group border-solid border-2 rounded-lg">
             {variableElement}
-            {isLoading ? <span>...</span> : <span></span>}
         </div>
     )
 }
