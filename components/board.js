@@ -91,7 +91,7 @@ export default function Board({ id, boardJSON }) {
         workerRef.current.log = (timestamp, messageType, payload) => {
             const message = `${timestamp} - ${messageType}${payload ? ': ' + payload : ''}`
 
-            setLogMessages(messages => [...messages, message])
+            setLogMessages(messages => [message, ...messages])
         }
         workerRef.current.on('ready', payload => {
             setIsLoading(false)
