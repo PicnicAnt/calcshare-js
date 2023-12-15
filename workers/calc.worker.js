@@ -1,3 +1,4 @@
+import { mathService } from '@/services/math-service.js'
 import { delay, message } from './worker.js'
 
 addEventListener('message', (event) => {
@@ -33,7 +34,16 @@ function addCalculation(calculation) {
 }
 
 function updateCalculation(calculationId, calculation) {
-    message('updated-calculation', JSON.stringify(calculation))
+    message('updating-calculation', calculation)
+    const result = mathService.parse(calculation)
+
+    const solutions = result.solutions.map(solution => ({
+        calculationId,
+        variable: solution.variable,
+        solutions: [...new Set(solution.solutions.map(s => s.symbol.value))]
+    }))
+
+    message('updated-calculation', solutions)
 }
 
 function removeCalculation(calculationId) {
@@ -47,15 +57,3 @@ function calculateVariables(variables) {
         message('calculated-variable', variable.name)
     }
 }
-
-// // Simulates heavy load
-// function delay(ms) {
-//     const start = Date.now();
-//     while (Date.now() - start < ms) {
-//         // Busy-waiting to consume CPU time
-//     }
-// }
-
-// function message(messageType, payload) {
-//     postMessage({ messageType, payload })
-// }

@@ -107,6 +107,35 @@ export default function Board({ id, boardJSON }) {
 
         workerWrapper.on('calculated-variable', onCalculatedVariable)
 
+        workerWrapper.on('updating-calculation', calculation => {
+            console.log(`Updating calculation ${calculation}...`)
+        })
+
+        workerWrapper.on('updated-calculation', solutions => {
+            console.log('vars', variables, solutions)
+            for (let solution of solutions) {
+                const updatedVariables = variables.map((variable) => {
+                    // console.log('solution', variable.solution)
+                    if (variable.name === solution.variable) {
+                        console.log('solution', variable.solutions, solution)
+                        if (!variable.solutions) {
+                            variable.solutions = []
+                        }
+
+                        variable.solutions = [
+                            ...variable.solutions.filter(s => s.calculationId !== solution.calculationId),
+                            ...solution.solutions.map(s => ({ calculationId: solution.calculationId, solution: s }))
+                        ]
+                    }
+
+                    return variable
+                })
+
+                setVariables(updatedVariables)
+            }
+            // console.log(`Updated calculation. Result is ${JSON.stringify(solutions)}`)
+        })
+
         workerWrapper.postMessage('init', board)
 
         workerRef.current = workerWrapper
@@ -118,16 +147,21 @@ export default function Board({ id, boardJSON }) {
         <div>
             <h1>Variables</h1>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 p-4">
-                {variables.map((variable) => (<Variable
-                    key={variable._id}
-                    id={variable._id}
-                    name={variable.displayName ?? variable.name}
-                    input={variable.input}
-                    value={variable.value}
-                    isDeterminate={variable.isDeterminate}
-                    isLoading={variable.isLoading}
-                    onChange={(input) => updateVariableInput(variable._id, input)}
-                />))}
+                {variables.map((variable) => (<div key={variable._id}>
+                    <Variable
+                        id={variable._id}
+                        name={variable.displayName ?? variable.name}
+                        input={variable.input}
+                        value={variable.value}
+                        isDeterminate={variable.isDeterminate}
+                        isLoading={variable.isLoading}
+                        onChange={(input) => updateVariableInput(variable._id, input)}
+                    />
+                    {variable.solutions && <ul>
+                        {variable.solutions.map(solution => <li key={solution.solution}>{solution.solution}</li>)}
+                    </ul>}
+                </div>))}
+
             </div>
             <hr />
             <h1>Calculations</h1>
