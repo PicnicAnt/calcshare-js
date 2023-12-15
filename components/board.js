@@ -47,7 +47,7 @@ export default function Board({ id, boardJSON }) {
         /* TODO: create a proper ID */
         setIsLoading(true)
         const calculation = {
-            _id: '12352343',
+            _id: Math.random().toString(),
             equation: {
                 raw: ''
             }
@@ -85,31 +85,33 @@ export default function Board({ id, boardJSON }) {
     }
 
     useEffect(() => {
-        const worker = new Worker(new URL('../workers/calcworker.js', import.meta.url))
-
-        workerRef.current = new WorkerWrapper(worker)
-        workerRef.current.log = (timestamp, messageType, payload) => {
+        const worker = new Worker(new URL('../workers/calc.worker.js', import.meta.url))
+        const workerWrapper = new WorkerWrapper(worker)
+        workerWrapper.log = (timestamp, messageType, payload) => {
             const message = `${timestamp} - ${messageType}${payload ? ': ' + payload : ''}`
 
             setLogMessages(messages => [message, ...messages])
         }
-        workerRef.current.on('ready', payload => {
+
+        workerWrapper.on('ready', payload => {
             setIsLoading(false)
             console.log('worker is now ready')
         })
 
-        workerRef.current.on('added-calculation', payload => {
+        workerWrapper.on('added-calculation', payload => {
             console.log('added calculation', payload)
             setIsLoading(false)
         })
 
-        workerRef.current.on('calculating-variable', onCalculatingVariable)
+        workerWrapper.on('calculating-variable', onCalculatingVariable)
 
-        workerRef.current.on('calculated-variable', onCalculatedVariable)
+        workerWrapper.on('calculated-variable', onCalculatedVariable)
 
-        workerRef.current.postMessage('init', board)
+        workerWrapper.postMessage('init', board)
 
-        return () => workerRef.current.terminate()
+        workerRef.current = workerWrapper
+
+        return () => workerWrapper.terminate()
     }, [board])
 
     return (

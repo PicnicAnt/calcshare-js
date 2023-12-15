@@ -1,3 +1,5 @@
+import { delay, message } from './worker.js'
+
 addEventListener('message', (event) => {
     const { action, payload } = JSON.parse(event.data)
 
@@ -46,14 +48,14 @@ function calculateVariables(variables) {
     }
 }
 
-// Simulates heavy load
-function delay(ms) {
-    const start = Date.now();
-    while (Date.now() - start < ms) {
-        // Busy-waiting to consume CPU time
-    }
-}
+// // Simulates heavy load
+// function delay(ms) {
+//     const start = Date.now();
+//     while (Date.now() - start < ms) {
+//         // Busy-waiting to consume CPU time
+//     }
+// }
 
-function message(messageType, payload) {
-    postMessage({ messageType, payload })
-}
+// function message(messageType, payload) {
+//     postMessage({ messageType, payload })
+// }
