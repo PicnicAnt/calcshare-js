@@ -12,6 +12,7 @@
     "autoprefixer": "10.4.15",
     "eslint": "8.49.0",
     "eslint-config-next": "^13.5.3",
+    "memory-cache": "^0.2.0",
     "mongodb": "^6.1.0",
     "nerdamer": "^1.1.13",
     "next": "^13.5.3",
