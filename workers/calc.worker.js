@@ -37,11 +37,11 @@ function updateCalculation(calculationId, calculation) {
     message('updating-calculation', calculation)
     const result = mathService.parse(calculation)
 
-    const solutions = result.solutions.map(solution => ({
+    const solutions = result.equation.isParseSuccess ? result.solutions.map(solution => ({
         calculationId,
         variable: solution.variable,
-        solutions: [...new Set(solution.solutions.map(s => s.symbol.value))]
-    }))
+        solutions: [...new Set(solution.solutions.map ? solution.solutions.map(s => s.symbol.value) : solution.solutions.symbol.value)]
+    })) : []
 
     message('updated-calculation', solutions)
 }
@@ -53,7 +53,7 @@ function removeCalculation(calculationId) {
 function calculateVariables(variables) {
     for (let variable of variables) {
         message('calculating-variable', variable.name)
-        delay(1000)
+        delay(200)
         message('calculated-variable', variable.name)
     }
 }

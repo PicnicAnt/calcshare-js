@@ -44,7 +44,6 @@ export default function Board({ id, boardJSON }) {
     }
 
     function addCalculation() {
-        /* TODO: create a proper ID */
         setIsLoading(true)
         const calculation = {
             _id: Math.random().toString(),
@@ -61,7 +60,6 @@ export default function Board({ id, boardJSON }) {
     }
 
     function onCalculatingVariable(variableName) {
-        console.log('calculating variable', variableName)
         const updatedVariables = variables.map((variable) => {
             if (variable.name === variableName) {
                 variable.isLoading = true
@@ -73,7 +71,6 @@ export default function Board({ id, boardJSON }) {
     }
 
     function onCalculatedVariable(variableName) {
-        console.log('calculated variable', variableName)
         const updatedVariables = variables.map((variable) => {
             if (variable.name === variableName) {
                 variable.isLoading = false
@@ -108,16 +105,13 @@ export default function Board({ id, boardJSON }) {
         workerWrapper.on('calculated-variable', onCalculatedVariable)
 
         workerWrapper.on('updating-calculation', calculation => {
-            console.log(`Updating calculation ${calculation}...`)
+
         })
 
         workerWrapper.on('updated-calculation', solutions => {
-            console.log('vars', variables, solutions)
             for (let solution of solutions) {
                 const updatedVariables = variables.map((variable) => {
-                    // console.log('solution', variable.solution)
                     if (variable.name === solution.variable) {
-                        console.log('solution', variable.solutions, solution)
                         if (!variable.solutions) {
                             variable.solutions = []
                         }
@@ -133,7 +127,6 @@ export default function Board({ id, boardJSON }) {
 
                 setVariables(updatedVariables)
             }
-            // console.log(`Updated calculation. Result is ${JSON.stringify(solutions)}`)
         })
 
         workerWrapper.postMessage('init', board)

@@ -37,7 +37,7 @@ export class WorkerWrapper {
                 if (this.log) {
                     const now = new Date()
                     const timestamp = `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}.${now.getMilliseconds()}`
-                    this.log(timestamp, messageType, payload)
+                    this.log(timestamp, messageType, typeof payload === 'object' ? JSON.stringify(payload) : payload)
                 }
             }
         }
