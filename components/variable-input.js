@@ -16,7 +16,6 @@ export default function VariableInput({ name, input, value, onChange }) {
         <span>
             <input
                 className="w-full p-4 rounded-lg"
-                autoFocus
                 value={valueDisplay}
                 onChange={(event) => onChange(event.target.value.substring(name.length + 3))}
                 placeholder={placeholderDisplay} />
