@@ -33,7 +33,7 @@ export default function Board({ id, boardJSON }) {
 
                 workerRef.current.postMessage('update-calculation', {
                     calculationId,
-                    calculation: equationInput
+                    equation: equationInput
                 })
             }
 
