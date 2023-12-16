@@ -12,7 +12,7 @@ addEventListener('message', (event) => {
             addCalculation(payload)
             break
         case 'update-calculation':
-            updateCalculation(payload.calculationId, payload.calculation)
+            updateCalculation(payload.calculationId, payload.equation)
             break
         case 'remove-calculation':
             removeCalculation(payload.calculationId)
@@ -25,7 +25,11 @@ addEventListener('message', (event) => {
     }
 })
 
-function init() {
+function init(board) {
+    for (const calculation of board.calculations) {
+        updateCalculation(calculation._id, calculation.equation.raw)
+    }
+
     message('ready')
 }
 
@@ -33,9 +37,9 @@ function addCalculation(calculation) {
     message('added-calculation', JSON.stringify(calculation))
 }
 
-function updateCalculation(calculationId, calculation) {
-    message('updating-calculation', calculation)
-    const result = mathService.parse(calculation)
+function updateCalculation(calculationId, equation) {
+    message('updating-calculation', equation)
+    const result = mathService.parse(equation)
 
     const solutions = result.equation.isParseSuccess ? result.solutions.map(solution => ({
         calculationId,

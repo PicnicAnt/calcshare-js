@@ -81,6 +81,39 @@ export default function Board({ id, boardJSON }) {
         setVariables(updatedVariables)
     }
 
+    function onUpdatedCalculation(solutions) {
+        for (let solution of solutions) {
+            const updatedVariables = variables.map((variable) => {
+                if (variable.name === solution.variable) {
+                    if (!variable.solutions) {
+                        variable.solutions = []
+                    }
+
+                    variable.solutions = [
+                        ...variable.solutions.filter(s => s.calculationId !== solution.calculationId),
+                        ...solution.solutions.map(s => ({ calculationId: solution.calculationId, solution: s }))
+                    ]
+                }
+
+                return variable
+            })
+
+            setVariables(updatedVariables)
+        }
+    }
+
+    function onUpdatingCalculation(calculation) {
+
+    }
+
+    function onReady() {
+        setIsLoading(false)
+    }
+
+    function onAddedCalculation() {
+        setIsLoading(false)
+    }
+
     useEffect(() => {
         const worker = new Worker(new URL('../workers/calc.worker.js', import.meta.url))
         const workerWrapper = new WorkerWrapper(worker)
@@ -90,44 +123,12 @@ export default function Board({ id, boardJSON }) {
             setLogMessages(messages => [message, ...messages])
         }
 
-        workerWrapper.on('ready', payload => {
-            setIsLoading(false)
-            console.log('worker is now ready')
-        })
-
-        workerWrapper.on('added-calculation', payload => {
-            console.log('added calculation', payload)
-            setIsLoading(false)
-        })
-
+        workerWrapper.on('ready', onReady)
+        workerWrapper.on('added-calculation', onAddedCalculation)
         workerWrapper.on('calculating-variable', onCalculatingVariable)
-
         workerWrapper.on('calculated-variable', onCalculatedVariable)
-
-        workerWrapper.on('updating-calculation', calculation => {
-
-        })
-
-        workerWrapper.on('updated-calculation', solutions => {
-            for (let solution of solutions) {
-                const updatedVariables = variables.map((variable) => {
-                    if (variable.name === solution.variable) {
-                        if (!variable.solutions) {
-                            variable.solutions = []
-                        }
-
-                        variable.solutions = [
-                            ...variable.solutions.filter(s => s.calculationId !== solution.calculationId),
-                            ...solution.solutions.map(s => ({ calculationId: solution.calculationId, solution: s }))
-                        ]
-                    }
-
-                    return variable
-                })
-
-                setVariables(updatedVariables)
-            }
-        })
+        workerWrapper.on('updating-calculation', onUpdatingCalculation)
+        workerWrapper.on('updated-calculation', onUpdatedCalculation)
 
         workerWrapper.postMessage('init', board)
 
