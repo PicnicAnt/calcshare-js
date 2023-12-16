@@ -22,9 +22,11 @@ export default function Variable({ name, input, value, isDeterminate, onChange, 
             onChange={onChange} />
     }, [input, value, name, isDeterminate, onChange])
 
+    const className = `group border-solid rounded-lg border-black dark:border-white ${isDeterminate && !input ? '' : 'border-2'}`
+
     return (
-        <div className="group border-solid border-2 rounded-lg">
+        <div className={className}>
             {variableElement}
-        </div>
+        </div >
     )
 }

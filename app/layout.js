@@ -1,3 +1,4 @@
+import ThemeSelector from '@/components/theme-selector'
 import { Inter } from 'next/font/google'
 import Link from 'next/link'
 import './globals.css'
@@ -11,10 +12,15 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" className='p-3'>
       <body className={inter.className}>
-        <header>
-          <Link href="/">CalcShare</Link>
+        <header className='flex justify-between'>
+          <div className='flex'>
+            <Link href="/">CalcShare</Link>
+          </div>
+          <div className='flex justify-left'>
+            <ThemeSelector />
+          </div>
         </header>
         <hr className='m-4' />
         <main className="min-h-screen">
