@@ -82,7 +82,9 @@ export default function Board({ id, boardJSON }) {
     }
 
     function onUpdatedCalculation(solutions) {
+        console.log('sol', solutions)
         for (let solution of solutions) {
+            let isNewVariable = true
             const updatedVariables = variables.map((variable) => {
                 if (variable.name === solution.variable) {
                     if (!variable.solutions) {
@@ -93,10 +95,22 @@ export default function Board({ id, boardJSON }) {
                         ...variable.solutions.filter(s => s.calculationId !== solution.calculationId),
                         ...solution.solutions.map(s => ({ calculationId: solution.calculationId, solution: s }))
                     ]
+                    isNewVariable = false
                 }
 
                 return variable
             })
+
+            if (isNewVariable) {
+                console.log('got a new one')
+                updatedVariables.push({
+                    _id: Math.random().toString(),
+                    name: solution.variable,
+                    solutions: solution.solutions.map(s => ({ calculationId: solution.calculationId, solution: s }))
+                })
+            }
+
+            console.log('vars', updatedVariables)
 
             setVariables(updatedVariables)
         }
